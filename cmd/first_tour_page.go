@@ -6,7 +6,7 @@ import (
 )
 
 // https://go.dev/tour/list
-func main() {
+func first_tour_page() {
 	fmt.Println("Hello World!")
 	fmt.Println(`Hello
 	World`) // Using backticks for multi-line string, will already be formatted as is
