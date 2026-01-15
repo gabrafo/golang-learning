@@ -40,6 +40,9 @@ func main() {
 
 	var xFH, xSH int = half(2)
 	fmt.Printf("If there are 2 oranges, and we share them... I will get %d orange and you will get %d orange.\n", xFH, xSH)
+
+	implicitTypeAndDeclaration := "This string was declared using the ':=' operator, which does not require typing the keyword 'var' nor its type."
+	fmt.Println(implicitTypeAndDeclaration)
 }
 
 // func keyword + name of the function + (varName type) + return type + block of code
@@ -57,7 +60,7 @@ func sum(x, y int) int {
 func half(x int) (xFirstHalf, xSecondHalf int) {
 	xFirstHalf = x / 2
 	xSecondHalf = x / 2
-	return // Returns xFirstHalf and xSecondHalf
+	return // Returns xFirstHalf and xSecondHalf using naked return (https://go.dev/tour/basics/7)
 }
 
 func getAgeInput(ageUser *uint8) {
