@@ -37,6 +37,9 @@ func main() {
 	fmt.Print("Type up your age: ")
 	getAgeInput(&ageUser)
 	fmt.Printf("How old will YOU be in 20 years from now? %d\n", sum(int(ageUser), 20))
+
+	var xFH, xSH int = half(2)
+	fmt.Printf("If there are 2 oranges, and we share them... I will get %d orange and you will get %d orange.\n", xFH, xSH)
 }
 
 // func keyword + name of the function + (varName type) + return type + block of code
@@ -51,6 +54,12 @@ func sum(x, y int) int {
 	return x + y
 }
 
+func half(x int) (xFirstHalf, xSecondHalf int) {
+	xFirstHalf = x / 2
+	xSecondHalf = x / 2
+	return // Returns xFirstHalf and xSecondHalf
+}
+
 func getAgeInput(ageUser *uint8) {
 	_, err := fmt.Scan(ageUser)
 	if err != nil {
@@ -59,13 +68,14 @@ func getAgeInput(ageUser *uint8) {
 }
 
 /*
-TODO:
+- TODO:
 
 - Continue the tour
 https://go.dev/tour/list
 
 - Read about errors in Golang
 https://go.dev/doc/faq#exceptions
+https://go.dev/blog/error-handling-and-go
 
 - Read more about OOP in Golang, since it does not have classes
 */
