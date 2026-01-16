@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"runtime"
 )
 
@@ -45,7 +46,6 @@ func main() {
 	} else {
 		fmt.Printf("In this code, there was an if condition, where it checked if %d is lesser than %d. The condition ended up being truth, that is why this message is not being printed out to you, dear reader. If it is being printed though, maybe you, or me, have changed the values.\n", j, i) // https://go.dev/tour/flowcontrol/7
 	}
-
 	// No need to add the "break" clause
 	// Evaluates from top to bottom
 	// Switch with no condition is just "true"
@@ -59,4 +59,31 @@ func main() {
 	default:
 		fmt.Println("Nothing to brag about...")
 	}
+
+	fmt.Println(fileHandling())
 }
+
+func fileHandling() (message string) {
+	file, err := os.Create("defer_explanation.txt")
+
+	var pointerToMessage *string = &message
+
+	defer errorHandling(err, pointerToMessage) // The deferred call will run when fileHandling() returns. The arguments are evaluated immediately, but execution is delayed.
+
+	defer file.Close() // Even though deferred statements are executed in a LIFO way, their arguments are evaluated immediately. As such, I cannot place file.Close() before the errorHandling() call. The reason being: if os.Create() fails, file will be a nil variable. If the runtime evaluate an statement "nil.Close()" it will be trouble.
+
+	file.WriteString(`A defer statement defers the execution of a function until the surrounding function returns.
+The deferred call's arguments are evaluated immediately, but the function call is not executed until the surrounding function returns.`)
+
+	return
+}
+
+func errorHandling(err error, errMessage *string) {
+	if err != nil {
+		*errMessage = fmt.Errorf("ERROR: %w\n", err).Error()
+	} else {
+		*errMessage = "No errors in file handling. New file created."
+	}
+}
+
+// - TODO: Explain step by step how fileHandling() and erroHandling() work in a documentation, why returning *message without a naming return did not work and how defer and return interact with each other.
