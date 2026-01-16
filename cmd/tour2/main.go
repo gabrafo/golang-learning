@@ -46,6 +46,7 @@ func main() {
 	} else {
 		fmt.Printf("In this code, there was an if condition, where it checked if %d is lesser than %d. The condition ended up being truth, that is why this message is not being printed out to you, dear reader. If it is being printed though, maybe you, or me, have changed the values.\n", j, i) // https://go.dev/tour/flowcontrol/7
 	}
+
 	// No need to add the "break" clause
 	// Evaluates from top to bottom
 	// Switch with no condition is just "true"
