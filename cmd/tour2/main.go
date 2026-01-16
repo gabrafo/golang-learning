@@ -61,6 +61,9 @@ func main() {
 	}
 
 	fmt.Println(fileHandling())
+
+	fmt.Println("Counting once again...")
+	deferExample()
 }
 
 func fileHandling() (message string) {
@@ -86,4 +89,21 @@ func errorHandling(err error, errMessage *string) {
 	}
 }
 
-// - TODO: Explain step by step how fileHandling() and erroHandling() work in a documentation, why returning *message without a naming return did not work and how defer and return interact with each other.
+// Naked returns/Regular returns and defer interactions explained in the two links bellow
+
+// https://stackoverflow.com/questions/37248898/how-does-defer-and-named-return-value-work
+
+// https://go.dev/ref/spec#Defer_statements
+// This one, specially, explains why fileHandling worked and why I had to use an naked return, and not an regular return.
+// "If the surrounding function returns through an explicit return statement, deferred functions are executed after any result parameters are set by that return statement but before the function returns to its caller", that is why an regular return with the "message" variable would not work. Besides, "If the deferred function has any return values, they are discarded when the function completes".
+// And here is why I had to use an naked return: "if the deferred function is a function literal and the surrounding function has named result parameters that are in scope within the literal, the deferred function may access and modify the result parameters before they are returned".
+
+// More examples of defer
+func deferExample() {
+	fmt.Println("0")
+	defer fmt.Println("3")
+	defer fmt.Println("2")
+	defer fmt.Println("1")
+
+	// First prints zero, and then prints in LIFO order, so: 0, 1, 2, 3.
+}
