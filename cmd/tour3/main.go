@@ -41,4 +41,11 @@ func main() {
 	var nonAnonGraph Graph
 	nonAnonGraph.X = 12
 	nonAnonGraph.Y = 12
+
+	// Interesting Stack Overflow post about constructors in Go (there are no constructors in Go by default): https://stackoverflow.com/questions/18125625/constructors-in-go
+	// Another way of declaring variables in Go is listed here: https://go.dev/tour/moretypes/5
+	var (
+		anotherNonAnonGraph = Graph{12, 12}
+	)
+
 }
