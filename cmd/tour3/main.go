@@ -20,6 +20,25 @@ func main() {
 	fmt.Println("'q' holds the value ", q, ".")
 	fmt.Println("I can also access this same value using 'p'. Here it is: ", *p, ".")
 
-	// Structs in Go (OOP)
+	// Structs in Go (OOP).
 	// https://go.dev/tour/moretypes/2
+	// https://go.dev/ref/spec#Struct_types
+	// Struct is a type in Go. A struct is defined as an composed value that groups up named fields, which of them with its particular types.
+	// An struct cannot hold on another struct.
+	var graph struct {
+		X int
+		Y int
+	}
+	graph.Y = 12
+	graph.X = 12
+	// This is an anon struct. Basically an object with no class. There is no easy way to recreate its structure in other objects.
+
+	// Here is how you can make an struct reusable by other objects.
+	type Graph struct {
+		X int
+		Y int
+	}
+	var nonAnonGraph Graph
+	nonAnonGraph.X = 12
+	nonAnonGraph.Y = 12
 }
