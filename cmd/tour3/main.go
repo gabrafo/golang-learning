@@ -121,4 +121,35 @@ func main() {
 	// The old array remains unchanged.
 	fmt.Println("Original array after an append that exceeds his capacity: ", experimentalArray)
 	fmt.Println("After an slice append that exceeds the capacity of the array it is pointing to, the slice creates another array to replace the old one with the changed values, capacity, and length.")
+
+	// Maps
+	// https://go.dev/tour/moretypes/19
+	var mapInGo map[string]int = make(map[string]int)
+	mapInGo["one"] = 1
+	fmt.Println("The key 'one' returns ", mapInGo["one"], " in our current map.")
+
+	// Map literal
+	// https://go.dev/tour/moretypes/20
+	var newMap = map[string]int{
+		"one":   11,
+		"two":   2,
+		"three": 3,
+	}
+	fmt.Println("The key 'one' returns ", newMap["one"], " in our new map.")
+
+	delete(newMap, "one")
+
+	// I will not go further in map operations, since they are basically the same for every language. If I ever need to use them and don't find quickly how, I will rely on documentation.o
+	// Here is more on this subject (aside from the doc itself): https://go.dev/tour/moretypes/22
+
+	// Functions as values
+	pow := func(x, y int) (res int) {
+		res = 1
+		for range y {
+			res *= x
+		}
+		return
+	}
+
+	fmt.Println("5 to the power of 5 is: ", pow(5, 5))
 }
