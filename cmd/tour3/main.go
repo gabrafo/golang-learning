@@ -152,4 +152,17 @@ func main() {
 	}
 
 	fmt.Println("5 to the power of 5 is: ", pow(5, 5))
+
+	// Closures
+	// A closure is a function value that references variables from outside its body and that are not passed down as parameters. It basically uses values from the scope in which it was created.
+	factor := 2
+
+	pair := func(x int) (pairNumber int) {
+		return x * factor // Uses "factor", which is a variable from the "main" function that was not passed down as an argument. The anonymous function can access factor because it is in the same lexical scope, and it becomes a closure because it captures that variable, holding a reference to it rather than a copy.
+	}
+
+	fmt.Println("What is the double of 3? Answer: ", pair(3))
+
+	factor = 4
+	fmt.Println("What is the quadruple of 3? Answer: ", pair(3)) // Uses the current value of factor, since it holds a reference to it in the function body.
 }
