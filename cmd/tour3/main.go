@@ -155,6 +155,7 @@ func main() {
 
 	// Closures
 	// A closure is a function value that references variables from outside its body and that are not passed down as parameters. It basically uses values from the scope in which it was created.
+	// https://go.dev/tour/moretypes/25
 	factor := 2
 
 	pair := func(x int) (pairNumber int) {
