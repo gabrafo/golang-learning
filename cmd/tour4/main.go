@@ -22,8 +22,27 @@ func main() {
 	s.scale(2)
 	fmt.Println("I doubled the scale of our 's' variable using a brand new method called 'scale'. It accesses the object via a pointer and changes its attributes without explicit return.")
 	fmt.Println("Variable 's': ", s)
+
+	fmt.Println("Interfaces in Go...")
+
+	// The assignment var g Geometry = Square{10, 10} works because the area and perimeter methods
+	// have value receivers (s Square). If one of these methods required a pointer receiver (s *Square),
+	// the Square value type would not satisfy the Geometry interface, because a value of type T
+	// does not possess the methods that require a *T pointer. In that case, only a pointer
+	// (&Square{...}) would satisfy the contract.
+	var g Geometry = Square{10, 10}
+
+	fmt.Println("Structs 'Square' and 'Rectangle' implement 'Geometry' interface by having all its methods coded.")
+	fmt.Println("Let's see the variable 'g' which type is 'Geometry' and was initialized using a 'Square' literal. g: ", g)
+	checkType(g)
+
+	g = Rectangle{10, 10}
+	fmt.Println("Let's see the variable 'g' which type is 'Geometry' and has received a 'Rectangle' literal. g: ", g)
+	checkType(g)
 }
 
+// "Square" has public visibility since its first letter is upper-cased
+// The struct is exported and can be used in other files/packages, but not their attributes, which start with an lower-cased letter
 type Square struct {
 	height, length float64
 }
@@ -55,3 +74,47 @@ func (s *Square) scale(x float64) {
 	s.height *= x
 	s.length *= x
 }
+
+// Interfaces in Go
+// Interfaces define a set of method signatures that a type must implement. They simply act as a contract.
+// A type implements an interface by implementing its methods. There is no explicit declaration of intent, no "implements" keyword.
+// https://go.dev/tour/methods/9
+// https://medium.com/@danielabatibabatunde1/simplifying-structs-methods-and-interfaces-in-golang-e86a0c4618aa
+type Geometry interface {
+	area() float64
+	perimeter() float64
+}
+
+// Square already implements area(), now I will make it implement perimeter() as well. That way, it will satisfy the "Geometry" interface contract.
+func (s Square) perimeter() float64 {
+	return (s.length + s.height) * 2
+}
+
+type Rectangle struct {
+	Height, Length float64 // Both "Height" and "Length" are public acessible, just like the struct itself
+}
+
+// Rectangle satisfies Geometry's contract as well
+func (r Rectangle) area() float64 {
+	return r.Height * r.Length
+}
+
+func (r Rectangle) perimeter() float64 {
+	return (r.Height + r.Length) * 2
+}
+
+// Helper function
+func checkType(g Geometry) {
+	fmt.Println("g runtime type...")
+	switch g.(type) {
+	case Square:
+		fmt.Println("g type is 'Square'!")
+	case Rectangle:
+		fmt.Println("g type is 'Rectangle'!")
+	default:
+		fmt.Println("Unknown 'Geometry'.")
+	}
+}
+
+// TODO
+// - Explain concrete and non-concrete types in Go using interfaces as example
