@@ -53,7 +53,7 @@ func main() {
 }
 
 // "Square" has public visibility since its first letter is upper-cased
-// The struct is exported and can be used in other files/packages, but not their attributes, which start with an lower-cased letter
+// The struct is exported and can be used in other files in the same package, but not their attributes, which start with an lower-cased letter
 type Square struct {
 	height, length float64
 }
@@ -119,6 +119,9 @@ func (t Triangle) perimeter() float64 {
 func checkType(g Geometry) {
 	// Checking the first space of our tuple (type)
 	fmt.Println("g dynamic type...")
+
+	// Type assertions using a switch
+	// https://go.dev/tour/methods/16
 	switch g.(type) {
 	case Square:
 		fmt.Println("g type is 'Square'!")
