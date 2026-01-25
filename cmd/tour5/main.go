@@ -2,56 +2,97 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"log"
+	"net"
+	"time"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
+// Example below based on an exercise from Chapter 8 of "The Go Programming Language"
 // https://go.dev/tour/list
 func main() {
-	// https://go.dev/tour/generics/1
-	fmt.Println("Generics in Go...")
+	// https://go.dev/tour/concurrency/1
+	fmt.Println("Concurrency in Go...")
 
-	Index(5, 5)
-	Index("Hello", "Hello")
-	Index(10, 20)
+	// Go Routines
+	listener, err := net.Listen("tcp", ":8000")
+	if err != nil {
+		log.Fatalln("Failed to start TCP listener:", err) // Ends program, there is no reason for continuing if listening failed
+	}
 
-	var listStrings List[string]
-	listStrings.val = "Hello"
-	listStrings.next = &List[string]{nil, "World!"}
-	listStrings.Explore()
+	// Channel that listens to OS signals
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, os.Interrupt, syscall.SIGTERM) // Notifies "done" that an interrupt signal was sent (ending the server via terminal)
 
-	var listInt List[int]
-	listInt.val = 1
-	listInt.next = &List[int]{next: &List[int]{nil, 3}, val: 2}
-	listInt.Explore()
+	// Go routine that ends the server, listens to "done" waiting for an interrupt signal
+	go endServer(done, listener)
+
+	serve(listener, done)
 }
 
-// Go functions can be written to work on multiple types using type parameters.
-// The type parameters of a function appear between brackets, before the function's arguments.
-// `comparable` is a useful constraint that allows the use of `==` and `!=` operators.
-func Index[T comparable](x T, y T) {
-	fmt.Printf("Comparing values: %v and %v (type: %T)\n", x, y, x)
+// Blocking function, will execute this loop endlessly till done sends a signal
+func serve(listener net.Listener, done chan os.Signal) {
+	for { // Endless loop
+		conn, err := listener.Accept()
+		if err != nil {
+			select {
+				case <-done:
+					log.Println("Listener closed, connections loop exiting.")
+            		return 
 
-	if x == y {
-		fmt.Println("Values are equal!")
-	} else {
-		fmt.Println("Values are different!")
+				// Default case basically is an alternative if none of the selected cases happen.
+				// The idea is to make our select non-blocking, since it is not just waiting for signals, and has an alternative to keep on our for loop.
+				// https://go.dev/tour/concurrency/6
+				default: 
+					log.Println("Error accepting connection! Error message: ", err)
+					continue // Moves to the next iteration, without executing what comes next in this iteration
+			}
+		}
+		log.Println("Connection accepted!")
+		go handleConn(conn, done) // Handling connections concurrently with a Go Routine
 	}
 }
 
-// Generic type
-// https://go.dev/tour/generics/2
-// List represents a singly-linked list that holds
-// values of any type.
-type List[T any] struct {
-	next *List[T]
-	val  T
-}
+func handleConn(conn net.Conn, done chan os.Signal) {
+	defer conn.Close() // Closes the connection at the end of the function execution
+	ticker := time.NewTicker(1 * time.Second)
+	defer ticker.Stop()
 
-func (l *List[T]) Explore() {
-	fmt.Println("Exploring a list with generic type using the 'Explore' function...")
-	fmt.Printf("Current type: %T\n", l)
-	for l != nil {
-		fmt.Println(l.val)
-		l = l.next
+	for {
+		_, err := io.WriteString(conn, time.Now().Format("15:04:05\n"))
+		if err != nil {
+			log.Println("Client disconnected. Error message: ", err)
+			return // Ending Go Routine
+		}
+
+		// Select
+		// Is similar to a "switch", but each case specifies a communication operation (send or receive) on a channel.
+		// Without a "default" case, select blocks the goroutine until one of the cases is ready to proceed.
+		// https://go.dev/tour/concurrency/5
+		select {
+
+		case <-done:
+			// Triggered if a value is received from "done" (or if it is closed), ends active connections.
+			log.Println("Stopping handler via signal.")
+			return
+
+		case <- ticker.C:
+			// Channel that sends a signal after 1 second.
+			// This acts as a timeout or wait and just moves to the next execution of our loop. 
+		}
 	}
 }
 
+func endServer(done chan os.Signal, listener net.Listener) {
+	<-done // Go routine blocked, waiting signal
+	log.Println("Shutting down server...")
+	listener.Close() // Freeing 8000
+}
+
+// Interesting resources (I plan to deep dive them later on and bring more examples and thoughts to the table):
+// - https://stackoverflow.com/questions/48638663/what-is-relationship-between-goroutine-and-thread-in-kernel-and-user-state
+// - https://www.youtube.com/watch?v=KBZlN0izeiY&t=536s
+// - https://www.reddit.com/r/golang/comments/117a4x7/how_can_goroutines_be_more_scalable_than_kernel/
